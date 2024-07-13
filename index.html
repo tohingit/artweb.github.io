@@ -6,12 +6,78 @@
     <title>Paintings Gallery</title>
     <link rel="stylesheet" href="styles.css">
     <style>
-        .telegram-login-container {
-            display: none; /* Hide initially */
+        body {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh; /* Ensure full height of the viewport */
+            margin: 0; /* Remove default margin */
+            font-family: Arial, sans-serif; /* Use a standard font */
+        }
+
+        header {
+            background-color: #333;
+            color: #fff;
+            padding: 10px 0;
+            text-align: center;
+        }
+
+        main {
+            flex: 1; /* Fill remaining vertical space */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .gallery-container {
+            position: relative;
+            max-width: 800px;
+            padding: 20px;
+        }
+
+        .gallery {
+            display: flex;
+            justify-content: space-between;
+            overflow-x: hidden; /* Hide overflow to prevent arrows from causing scroll */
+            transition: transform 0.3s ease; /* Smooth transition for sliding effect */
+        }
+
+        .painting {
+            text-align: center;
+            width: 200px;
         }
 
         .purchase-btn {
-            cursor: pointer; /* Ensure cursor changes on hover */
+            cursor: pointer;
+        }
+
+        .telegram-login-container {
+            position: fixed;
+            bottom: 10px; /* Adjust as needed */
+            left: 10px; /* Adjust as needed */
+            z-index: 1000; /* Ensure it's above other content */
+        }
+
+        .arrow {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 30px;
+            height: 30px;
+            background-color: rgba(255, 255, 255, 0.5);
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 24px;
+            z-index: 100; /* Ensure arrows are above paintings */
+        }
+
+        .arrow-left {
+            left: 0;
+        }
+
+        .arrow-right {
+            right: 0;
         }
     </style>
 </head>
@@ -20,27 +86,31 @@
         <h1>Paintings Gallery</h1>
     </header>
     <main>
-        <section class="gallery">
-            <div class="painting">
-                <img src="painting1.jpg" alt="Painting 1">
-                <h2>Title of Painting 1</h2>
-                <p>Artist Name</p>
-                <button class="purchase-btn" onclick="handlePurchaseClick(this)">Purchase</button>
+        <div class="gallery-container">
+            <div class="arrow arrow-left" onclick="scrollGallery(-1)">&#10094;</div>
+            <div class="gallery">
+                <div class="painting">
+                    <img src="painting1.jpg" alt="Painting 1">
+                    <h2>Title of Painting 1</h2>
+                    <p>Artist Name</p>
+                    <button class="purchase-btn" onclick="handlePurchaseClick(this)">Purchase</button>
+                </div>
+                <div class="painting">
+                    <img src="painting2.jpg" alt="Painting 2">
+                    <h2>Title of Painting 2</h2>
+                    <p>Artist Name</p>
+                    <button class="purchase-btn" onclick="handlePurchaseClick(this)">Purchase</button>
+                </div>
+                <div class="painting">
+                    <img src="painting3.jpg" alt="Painting 3">
+                    <h2>Title of Painting 3</h2>
+                    <p>Artist Name</p>
+                    <button class="purchase-btn" onclick="handlePurchaseClick(this)">Purchase</button>
+                </div>
+                <!-- Add more paintings as needed -->
             </div>
-            <div class="painting">
-                <img src="painting2.jpg" alt="Painting 2">
-                <h2>Title of Painting 2</h2>
-                <p>Artist Name</p>
-                <button class="purchase-btn" onclick="handlePurchaseClick(this)">Purchase</button>
-            </div>
-            <div class="painting">
-                <img src="painting3.jpg" alt="Painting 3">
-                <h2>Title of Painting 3</h2>
-                <p>Artist Name</p>
-                <button class="purchase-btn" onclick="handlePurchaseClick(this)">Purchase</button>
-            </div>
-            <!-- Add more paintings as needed -->
-        </section>
+            <div class="arrow arrow-right" onclick="scrollGallery(1)">&#10095;</div>
+        </div>
     </main>
     <footer>
         <p>&copy; 2024 Paintings Gallery. All rights reserved.</p>
@@ -57,37 +127,49 @@
             data-onauth="onTelegramAuth(user)"
             data-request-access="write"></script>
     <script type="text/javascript">
-      function onTelegramAuth(user) {
-        alert('Logged in as ' + user.first_name + ' ' + user.last_name + ' (' + user.id + (user.username ? ', @' + user.username : '') + ')');
-      }
+        function onTelegramAuth(user) {
+            alert('Logged in as ' + user.first_name + ' ' + user.last_name + ' (' + user.id + (user.username ? ', @' + user.username : '') + ')');
+        }
 
-      // Automatically trigger Telegram login when the page loads
-      window.addEventListener('load', function() {
-          // Show the Telegram login container
-          document.querySelector('.telegram-login-container').style.display = 'block';
+        // Automatically trigger Telegram login when the page loads
+        window.addEventListener('load', function() {
+            // Show the Telegram login container
+            document.querySelector('.telegram-login-container').style.display = 'block';
 
-          // Load Telegram script dynamically
-          const telegramLoginDiv = document.getElementById('telegram-login');
-          const telegramScript = document.createElement('script');
-          telegramScript.src = "https://telegram.org/js/telegram-widget.js?22";
-          telegramScript.setAttribute('data-telegram-login', 'treasutetestbot');
-          telegramScript.setAttribute('data-size', 'large');
-          telegramScript.setAttribute('data-onauth', 'onTelegramAuth(user)');
-          telegramScript.setAttribute('data-request-access', 'write');
-          telegramLoginDiv.appendChild(telegramScript);
-      });
+            // Load Telegram script dynamically
+            const telegramLoginDiv = document.getElementById('telegram-login');
+            const telegramScript = document.createElement('script');
+            telegramScript.src = "https://telegram.org/js/telegram-widget.js?22";
+            telegramScript.setAttribute('data-telegram-login', 'treasutetestbot');
+            telegramScript.setAttribute('data-size', 'large');
+            telegramScript.setAttribute('data-onauth', 'onTelegramAuth(user)');
+            telegramScript.setAttribute('data-request-access', 'write');
+            telegramLoginDiv.appendChild(telegramScript);
+        });
 
-      // Function to handle purchase button click
-      function handlePurchaseClick(button) {
-          // Add vibration effect (if supported)
-          if (navigator.vibrate) {
-              navigator.vibrate(100); // Vibrate for 100ms
-          }
+        // Function to handle purchase button click
+        function handlePurchaseClick(button) {
+            // Add vibration effect (if supported)
+            if (navigator.vibrate) {
+                navigator.vibrate(100); // Vibrate for 100ms
+            }
 
-          // Add your purchase logic here
-          // For example, you can redirect to a purchase page or show a purchase modal
-          console.log('Purchase button clicked for:', button.parentNode.querySelector('h2').innerText);
-      }
+            // Add your purchase logic here
+            // For example, you can redirect to a purchase page or show a purchase modal
+            console.log('Purchase button clicked for:', button.parentNode.querySelector('h2').innerText);
+        }
+
+        // Function to scroll gallery left or right
+        function scrollGallery(direction) {
+            const gallery = document.querySelector('.gallery');
+            const scrollStep = gallery.clientWidth; // Scroll width based on one painting width
+
+            if (direction === -1) {
+                gallery.scrollBy(-scrollStep, 0); // Scroll left
+            } else if (direction === 1) {
+                gallery.scrollBy(scrollStep, 0); // Scroll right
+            }
+        }
     </script>
 </body>
 </html>
