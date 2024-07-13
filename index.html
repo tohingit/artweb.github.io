@@ -9,6 +9,10 @@
         .telegram-login-container {
             display: none; /* Hide initially */
         }
+
+        .purchase-btn {
+            cursor: pointer; /* Ensure cursor changes on hover */
+        }
     </style>
 </head>
 <body>
@@ -21,19 +25,19 @@
                 <img src="painting1.jpg" alt="Painting 1">
                 <h2>Title of Painting 1</h2>
                 <p>Artist Name</p>
-                <button class="purchase-btn">Purchase</button>
+                <button class="purchase-btn" onclick="handlePurchaseClick(this)">Purchase</button>
             </div>
             <div class="painting">
                 <img src="painting2.jpg" alt="Painting 2">
                 <h2>Title of Painting 2</h2>
                 <p>Artist Name</p>
-                <button class="purchase-btn">Purchase</button>
+                <button class="purchase-btn" onclick="handlePurchaseClick(this)">Purchase</button>
             </div>
             <div class="painting">
                 <img src="painting3.jpg" alt="Painting 3">
                 <h2>Title of Painting 3</h2>
                 <p>Artist Name</p>
-                <button class="purchase-btn">Purchase</button>
+                <button class="purchase-btn" onclick="handlePurchaseClick(this)">Purchase</button>
             </div>
             <!-- Add more paintings as needed -->
         </section>
@@ -72,6 +76,18 @@
           telegramScript.setAttribute('data-request-access', 'write');
           telegramLoginDiv.appendChild(telegramScript);
       });
+
+      // Function to handle purchase button click
+      function handlePurchaseClick(button) {
+          // Add vibration effect (if supported)
+          if (navigator.vibrate) {
+              navigator.vibrate(100); // Vibrate for 100ms
+          }
+
+          // Add your purchase logic here
+          // For example, you can redirect to a purchase page or show a purchase modal
+          console.log('Purchase button clicked for:', button.parentNode.querySelector('h2').innerText);
+      }
     </script>
 </body>
 </html>
