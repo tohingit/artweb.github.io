@@ -3,17 +3,35 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Simple HTML Example</title>
+    <title>Paintings Gallery</title>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <h1>Welcome to My Web Page</h1>
-    <p>This is a simple HTML file.</p>
-    <p>HTML stands for HyperText Markup Language.</p>
-    <ul>
-        <li>HTML</li>
-        <li>CSS</li>
-        <li>JavaScript</li>
-    </ul>
-    <a href="https://www.example.com">Visit Example.com</a>
+    <header>
+        <h1>Paintings Gallery</h1>
+    </header>
+    <main>
+        <section class="gallery">
+            <div class="painting">
+                <img src="painting1.jpg" alt="Painting 1">
+                <h2>Title of Painting 1</h2>
+                <p>Artist Name</p>
+            </div>
+            <div class="painting">
+                <img src="painting2.jpg" alt="Painting 2">
+                <h2>Title of Painting 2</h2>
+                <p>Artist Name</p>
+            </div>
+            <div class="painting">
+                <img src="painting3.jpg" alt="Painting 3">
+                <h2>Title of Painting 3</h2>
+                <p>Artist Name</p>
+            </div>
+            <!-- Add more paintings as needed -->
+        </section>
+    </main>
+    <footer>
+        <p>&copy; 2024 Paintings Gallery. All rights reserved.</p>
+    </footer>
 </body>
 </html>
