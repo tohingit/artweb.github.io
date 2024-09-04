@@ -348,5 +348,20 @@
         updateCoinDisplay();
         showTab('warehouse', document.querySelector('.nav-button'));
     </script>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <script>
+        // Инициализация Telegram Web App
+        const tg = window.Telegram.WebApp;
+        tg.expand(); // Развернуть Web App на весь экран
+
+        // Получение информации о пользователе
+        const user = tg.initDataUnsafe.user;
+        const username = user ? user.first_name + " " + user.last_name : "Guest";
+
+        // Отображение имени пользователя
+        document.getElementById('username').innerText = username;
+
+        // Your existing JavaScript logic here
+    </script>
 </body>
 </html>
