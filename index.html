@@ -82,10 +82,6 @@
             cursor: not-allowed;
         }
 
-        .nav-button.locked {
-            position: relative;
-        }
-
         .nav-button.locked::after {
             content: '🔒';
             position: absolute;
@@ -95,11 +91,23 @@
             color: #bbb;
         }
 
-        .game-container {
+        .game-container,
+        .task-container {
             display: flex;
             justify-content: center;
             align-items: center;
             flex-direction: column;
+            gap: 20px;
+        }
+
+        .game-box,
+        .reel,
+        .task,
+        .spin-button,
+        .deposit-button {
+            border-radius: 12px;
+            cursor: pointer;
+            transition: transform 0.3s, background-color 0.3s;
         }
 
         .game-box {
@@ -107,61 +115,12 @@
             height: 80px;
             background-color: #0078d7;
             margin-bottom: 20px;
-            border-radius: 12px;
-            cursor: pointer;
-            transition: transform 0.3s;
-        }
-
-        .game-message {
-            font-size: 16px;
-            color: #0078d7;
-        }
-
-        .task-container {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 20px;
-        }
-
-        .task {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            width: 80%;
-            padding: 10px;
-            border-radius: 12px;
-            background-color: #0078d7;
-            color: white;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-            cursor: pointer;
-            transition: background-color 0.3s;
-        }
-
-        .task:hover {
-            background-color: #005fa3;
-        }
-
-        .task.completed {
-            background-color: #32a852;
-            cursor: default;
-        }
-
-        .task.completed:hover {
-            background-color: #32a852;
-        }
-
-        .slot-machine {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
         }
 
         .reel {
             width: 60px;
             height: 60px;
             background-color: #0078d7;
-            border-radius: 12px;
             margin: 0 5px;
             display: flex;
             justify-content: center;
@@ -170,41 +129,44 @@
             color: white;
         }
 
-        .reels-container {
-            display: flex;
-            margin-bottom: 20px;
+        .spin-button,
+        .deposit-button {
+            padding: 10px 20px;
+            color: white;
+            border: none;
         }
 
         .spin-button {
-            padding: 10px 20px;
             background-color: #32a852;
-            color: white;
-            border: none;
-            border-radius: 12px;
-            cursor: pointer;
-            font-size: 18px;
-        }
-
-        .spin-button:disabled {
-            background-color: #bbb;
-            cursor: not-allowed;
-        }
-
-        .balance-display {
-            margin-bottom: 10px;
-            font-size: 18px;
         }
 
         .deposit-button {
-            padding: 10px 20px;
             background-color: #0078d7;
-            color: white;
-            border: none;
-            border-radius: 12px;
-            cursor: pointer;
-            font-size: 16px;
         }
 
+        .task {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 80%;
+            padding: 10px;
+            background-color: #0078d7;
+            color: white;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .task.completed {
+            background-color: #32a852;
+            cursor: default;
+        }
+
+        .task:hover {
+            background-color: #005fa3;
+        }
+
+        .task.completed:hover {
+            background-color: #32a852;
+        }
     </style>
 </head>
 <body>
@@ -227,26 +189,24 @@
     </div>
 
     <script>
-        let coinCount = parseInt(localStorage.getItem('coins')) || 0;
+        const coinCount = parseInt(localStorage.getItem('coins')) || 0;
         let demoBalance = parseFloat(localStorage.getItem('demoBalance')) || 100; // 100 mBTC
 
-        function updateCoinDisplay() {
+        const updateCoinDisplay = () => {
             document.getElementById('coinCount').innerText = coinCount;
         }
 
-        function updateDemoBalanceDisplay() {
+        const updateDemoBalanceDisplay = () => {
             document.getElementById('demoBalance').innerText = demoBalance.toFixed(2) + ' mBTC';
         }
 
-        function showTab(tab, button) {
+        const showTab = (tab, button) => {
             const content = document.getElementById('content');
-            const buttons = document.querySelectorAll('.nav-button');
-
-            buttons.forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.nav-button').forEach(btn => btn.classList.remove('active'));
             button.classList.add('active');
 
-            if (tab === 'warehouse') {
-                content.innerHTML = `
+            const tabs = {
+                warehouse: `
                     <div class="slot-machine">
                         <div class="balance-display">Balance: <span id="demoBalance">100.00 mBTC</span></div>
                         <div class="reels-container">
@@ -255,107 +215,91 @@
                             <div class="reel" id="reel3">🍉</div>
                         </div>
                         <button class="spin-button" onclick="spinReels()">Spin</button>
-
-                        
                         <button class="deposit-button" onclick="depositTON()">Deposit via TON</button>
                     </div>
-                `;
-                updateDemoBalanceDisplay();
-            } else if (tab === 'tasks') {
-                content.innerHTML = `
+                `,
+                tasks: `
                     <div class="task-container">
                         <div class="task" id="inviteFriendTask" onclick="completeTask('inviteFriendTask')">
                             Invite a friend via Telegram (Reward: 5 Coins)
                         </div>
                     </div>
-                `;
-            } else if (tab === 'game') {
-                content.innerHTML = `
+                `,
+                game: `
                     <div class="game-container">
                         <div class="game-box" onclick="jump()"></div>
                         <div class="game-message" id="gameMessage">Tap the square to make it jump!</div>
                     </div>
-                `;
-            } else if (tab === 'market') {
-                content.innerHTML = 'Market: Coming Soon';
-            }
+                `,
+                market: 'Market: Coming Soon'
+            };
+
+            content.innerHTML = tabs[tab] || '';
+            if (tab === 'warehouse') updateDemoBalanceDisplay();
         }
 
-        function spinReels() {
+        const spinReels = () => {
             if (demoBalance < 1) {
                 alert("Not enough balance to spin. Please deposit more mBTC.");
                 return;
             }
 
-            demoBalance -= 1; // Cost of each spin is 1 mBTC
+            demoBalance -= 1;
             localStorage.setItem('demoBalance', demoBalance);
             updateDemoBalanceDisplay();
 
             const symbols = ['🍒', '🍋', '🍉', '🍇', '🍓'];
-            const reel1 = symbols[Math.floor(Math.random() * symbols.length)];
-            const reel2 = symbols[Math.floor(Math.random() * symbols.length)];
-            const reel3 = symbols[Math.floor(Math.random() * symbols.length)];
+            const [reel1, reel2, reel3] = Array.from({ length: 3 }, () => symbols[Math.floor(Math.random() * symbols.length)]);
 
             document.getElementById('reel1').innerText = reel1;
             document.getElementById('reel2').innerText = reel2;
             document.getElementById('reel3').innerText = reel3;
 
-            // Example: if all three reels match, give 10 mBTC
             if (reel1 === reel2 && reel2 === reel3) {
                 demoBalance += 10;
-                alert("Congratulations! You won 10 mBTC!");
-                localStorage.setItem('demoBalance', demoBalance);
-                updateDemoBalanceDisplay();
-            }
-        }
-
-        function depositTON() {
-            // Simulate deposit using TON - This is just a placeholder for the actual integration
-            let depositAmount = prompt("Enter amount to deposit in mBTC:");
-            depositAmount = parseFloat(depositAmount);
-            if (!isNaN(depositAmount) && depositAmount > 0) {
-                demoBalance += depositAmount;
-                localStorage.setItem('demoBalance', demoBalance);
-                updateDemoBalanceDisplay();
-                alert(`Successfully deposited ${depositAmount} mBTC via TON.`);
+                alert("You win 10 mBTC!");
             } else {
-                alert("Invalid deposit amount.");
+                alert("Try again!");
             }
+
+            updateDemoBalanceDisplay();
         }
 
-        function completeTask(taskId) {
-            const taskElement = document.getElementById(taskId);
-            if (taskElement && !taskElement.classList.contains('completed')) {
-                coinCount += 5;
-                localStorage.setItem('coins', coinCount);
-                updateCoinDisplay();
-                taskElement.classList.add('completed');
-                taskElement.innerText = 'Task completed! Reward received.';
-            }
+        const completeTask = (taskId) => {
+            const task = document.getElementById(taskId);
+            if (task.classList.contains('completed')) return;
+
+            coinCount += 5;
+            localStorage.setItem('coins', coinCount);
+            updateCoinDisplay();
+
+            task.classList.add('completed');
+            task.innerHTML = 'Task Completed! (+5 Coins)';
         }
 
-        function jump() {
-            document.getElementById('gameMessage').innerText = 'Jumped!';
+        const depositTON = () => {
+            demoBalance += 100;
+            localStorage.setItem('demoBalance', demoBalance);
+            updateDemoBalanceDisplay();
+            alert('Deposit successful! Your balance has been updated.');
         }
 
-        // Initialize the interface
-        updateCoinDisplay();
-        showTab('warehouse', document.querySelector('.nav-button'));
-    </script>
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <script>
-        // Инициализация Telegram Web App
-        const tg = window.Telegram.WebApp;
-        tg.expand(); // Развернуть Web App на весь экран
+        const jump = () => {
+            const box = document.querySelector('.game-box');
+            const message = document.getElementById('gameMessage');
+            box.style.transform = 'translateY(-100px)';
+            message.innerText = 'Jumping!';
 
-        // Получение информации о пользователе
-        const user = tg.initDataUnsafe.user;
-        const username = user ? user.first_name + " " + user.last_name : "Guest";
+            setTimeout(() => {
+                box.style.transform = 'translateY(0)';
+                message.innerText = 'Tap the square to make it jump!';
+            }, 500);
+        }
 
-        // Отображение имени пользователя
-        document.getElementById('username').innerText = username;
-
-        // Your existing JavaScript logic here
+        document.addEventListener("DOMContentLoaded", () => {
+            updateCoinDisplay();
+            showTab('warehouse', document.querySelector('.nav-button'));
+        });
     </script>
 </body>
 </html>
