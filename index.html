@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Мини-игра: Прыгающий квадрат</title>
+    <title>Мини-игра: Прыгающий круг</title>
     <style>
         body {
             display: flex;
@@ -14,125 +14,140 @@
             background-color: #f0f0f0;
         }
         canvas {
-            background-color: #fff;
+            background-color: #f9f9f9;
             border: 2px solid #000;
         }
     </style>
 </head>
 <body>
 
-<canvas id="gameCanvas" width="400" height="400"></canvas>
+<canvas id="gameCanvas" width="400" height="600"></canvas>
 
 <script>
     const canvas = document.getElementById('gameCanvas');
     const ctx = canvas.getContext('2d');
 
-    let player = {
-        x: 50,
-        y: canvas.height - 30,
-        width: 20,
-        height: 20,
-        color: '#ff0000',
+    let score = 0;
+    let gravity = 0.6;
+    let jump = -10;
+    let platforms = [];
+    let isGameOver = false;
+
+    const player = {
+        x: 200,
+        y: 300,
+        radius: 20,
         dy: 0,
-        gravity: 0.6,
-        jumpPower: -10,
+        color: '#ff0000',
         isJumping: false
     };
 
-    let obstacles = [];
-    let gameSpeed = 2;
-    let score = 0;
-    let gameOver = false;
-
-    function createObstacle() {
-        let obstacle = {
-            x: canvas.width,
-            y: canvas.height - 30,
-            width: 20,
-            height: 20,
-            color: '#000'
-        };
-        obstacles.push(obstacle);
+    // Создание платформ
+    function createPlatforms() {
+        for (let i = 0; i < 5; i++) {
+            let platform = {
+                x: Math.random() * (canvas.width - 70),
+                y: i * 120,
+                width: 70,
+                height: 10,
+                color: '#00ff00'
+            };
+            platforms.push(platform);
+        }
     }
 
     function drawPlayer() {
+        ctx.beginPath();
+        ctx.arc(player.x, player.y, player.radius, 0, Math.PI * 2);
         ctx.fillStyle = player.color;
-        ctx.fillRect(player.x, player.y, player.width, player.height);
+        ctx.fill();
+        ctx.closePath();
     }
 
-    function drawObstacles() {
-        obstacles.forEach(obstacle => {
-            ctx.fillStyle = obstacle.color;
-            ctx.fillRect(obstacle.x, obstacle.y, obstacle.width, obstacle.height);
+    function drawPlatforms() {
+        platforms.forEach(platform => {
+            ctx.fillStyle = platform.color;
+            ctx.fillRect(platform.x, platform.y, platform.width, platform.height);
         });
     }
 
-    function updateObstacles() {
-        obstacles.forEach((obstacle, index) => {
-            obstacle.x -= gameSpeed;
+    function updatePlatforms() {
+        platforms.forEach(platform => {
+            platform.y += 2;
 
-            // Удаление препятствий за пределами экрана
-            if (obstacle.x + obstacle.width < 0) {
-                obstacles.splice(index, 1);
+            // Перемещение платформ в начало, если они исчезли за пределами экрана
+            if (platform.y > canvas.height) {
+                platform.y = -10;
+                platform.x = Math.random() * (canvas.width - 70);
                 score++;
             }
 
-            // Проверка столкновения с игроком
-            if (player.x < obstacle.x + obstacle.width &&
-                player.x + player.width > obstacle.x &&
-                player.y < obstacle.y + obstacle.height &&
-                player.y + player.height > obstacle.y) {
-                gameOver = true;
+            // Проверка столкновения игрока с платформой
+            if (player.dy > 0 &&
+                player.y + player.radius > platform.y &&
+                player.y + player.radius < platform.y + platform.height &&
+                player.x + player.radius > platform.x &&
+                player.x - player.radius < platform.x + platform.width) {
+                player.isJumping = true;
+                player.dy = jump;
             }
         });
     }
 
     function updatePlayer() {
-        if (player.isJumping) {
-            player.dy += player.gravity;
-            player.y += player.dy;
+        player.dy += gravity;
+        player.y += player.dy;
 
-            // Если игрок касается земли, останавливаем прыжок
-            if (player.y >= canvas.height - player.height - 30) {
-                player.y = canvas.height - player.height - 30;
-                player.isJumping = false;
-                player.dy = 0;
-            }
+        // Игрок возвращается наверх, если падает
+        if (player.y + player.radius > canvas.height) {
+            isGameOver = true;
+        }
+
+        if (player.y - player.radius < 0) {
+            player.y = 0 + player.radius;
         }
     }
 
     function gameLoop() {
-        if (gameOver) {
+        if (isGameOver) {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             ctx.font = '30px Arial';
             ctx.fillStyle = '#000';
-            ctx.fillText('Игра окончена!', 100, 200);
-            ctx.fillText('Счет: ' + score, 150, 240);
+            ctx.fillText('Игра окончена!', 100, 300);
+            ctx.fillText('Счет: ' + score, 150, 350);
             return;
         }
 
         ctx.clearRect(0, 0, canvas.width, canvas.height);
 
         drawPlayer();
-        drawObstacles();
-
+        drawPlatforms();
         updatePlayer();
-        updateObstacles();
+        updatePlatforms();
 
-        if (Math.random() < 0.01) {
-            createObstacle();
-        }
+        ctx.font = '20px Arial';
+        ctx.fillStyle = '#000';
+        ctx.fillText('Счет: ' + score, 10, 30);
 
         requestAnimationFrame(gameLoop);
     }
 
     document.addEventListener('click', function () {
-        if (!player.isJumping) {
+        if (!isGameOver) {
             player.isJumping = true;
-            player.dy = player.jumpPower;
+            player.dy = jump;
+        } else {
+            // Сброс игры после окончания
+            platforms = [];
+            score = 0;
+            player.y = 300;
+            player.dy = 0;
+            isGameOver = false;
+            createPlatforms();
         }
     });
 
+    createPlatforms();
     gameLoop();
 </script>
 
